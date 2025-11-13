@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dalga Yansıması ve Kırılması - Snell Yasası</title>
+    <style>
+        :root{
+          --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+          --bg: #0f172a;
+          --text: #f1f5f9;
+          --text-muted: #94a3b8;
+          --border: #334155;
+          --border-strong: #475569;
+          --panel: #1e293b;
+          --panel-hover: #334155;
+          --card-bg: #1e293b;
+          --card-text: #f1f5f9;
+          --header-bg: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+          --header-text: #ffffff;
+          --control-bg: #1e293b;
+          --control-border: #475569;
+          --simulation-bg: #0f172a;
+          --accent: #06b6d4;
+          --accent-glow: #22d3ee;
+          --shadow: rgba(0,0,0,.3);
+          --shadow-light: rgba(0,0,0,.1);
+          --primary: #3b82f6;
+          --primary-hover: #2563eb;
+          --success: #10b981;
+          --success-hover: #059669;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+        }
+
+        [data-theme="light"]{
+          --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+          --bg: #f8fafc;
+          --text: #1e293b;
+          --text-muted: #64748b;
+          --border: #cbd5e1;
+          --border-strong: #94a3b8;
+          --panel: #ffffff;
+          --panel-hover: #f1f5f9;
+          --card-bg: #ffffff;
+          --card-text: #1e293b;
+          --header-bg: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+          --header-text: #ffffff;
+          --control-bg: #ffffff;
+          --control-border: #e2e8f0;
+          --simulation-bg: #f0f8ff;
+          --accent: #06b6d4;
+          --accent-glow: #0891b2;
+          --shadow: rgba(0,0,0,.2);
+          --shadow-light: rgba(0,0,0,.05);
+          --primary: #3b82f6;
+          --primary-hover: #2563eb;
+          --success: #10b981;
+          --success-hover: #059669;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+            background: var(--bg);
+            background-image: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text);
+            line-height: 1.4;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            margin: 0;
+            padding: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Yukarı Ok Simgesi */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: var(--panel);
+            border: 2px solid var(--border);
+            color: var(--text);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+
+        .scroll-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .scroll-to-top:hover {
+            background: var(--panel-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .scroll-to-top .icon {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .scroll-to-top:hover .icon {
+            transform: translateY(-2px);
+        }
+
+        .theme-toggle{
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 1000;
+          background: var(--panel);
+          border: 2px solid var(--border);
+          color: var(--text);
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .theme-toggle:hover{
+          background: var(--panel-hover);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .theme-toggle .icon{
+          font-size: 20px;
+          transition: transform 0.3s ease;
+        }
+
+        [data-theme="light"] .theme-toggle .sun{
+          display: none;
+        }
+
+        [data-theme="dark"] .theme-toggle .moon{
+          display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .container {
+            max-width: 100%;
+            min-height: calc(100vh - 16px);
+            margin: 0 auto;
+            background: var(--panel);
+            border-radius: 16px;
+            box-shadow: 0 16px 32px var(--shadow);
+            overflow: visible;
+            animation: fadeIn 0.6s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 1920px) {
+            .container {
+                min-height: calc(100vh - 20px);
+                border-radius: 20px;
+            }
+        }
+
+        .header {
+            background: var(--header-bg);
+            color: var(--header-text);
+            padding: 14px 25px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        @media (min-width: 1920px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .header {
+                padding: 16px 25px;
+            }
+        }
+
+        /* Ana Layout Grid */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 260px;
+            grid-template-rows: 1fr auto;
+            gap: 15px;
+            padding: 15px;
+            flex: 1;
+            min-height: 0;
+            height: auto;
+            overflow: visible;
+        }
+
+        @media (min-width: 1920px) {
+            .dashboard-layout {
+                grid-template-columns: 320px 1fr 280px;
+                gap: 18px;
+                padding: 18px;
+            }
+        }
+
+        /* Sol Kontrol Paneli */
+        .left-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .control-group {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 1px 4px var(--shadow-light);
+            transition: all 0.3s ease;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .control-group:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .control-group h3 {
+            color: var(--text);
+            margin-bottom: 10px;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @media (min-width: 1920px) {
+            .control-group {
+                padding: 14px;
+            }
+            
+            .control-group h3 {
+                margin-bottom: 12px;
+                font-size: 1.05rem;
+            }
+        }
+
+        /* Orta Simülasyon Alanı */
+        .simulation-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .simulation-area {
+            position: relative;
+            background: var(--simulation-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            flex: 1;
+            min-height: 0;
+            height: 100%;
+        }
+
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            border-radius: 15px;
+        }
+
+        /* Sağ Bilgi Panelleri */
+        .right-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-panel {
+            background: var(--panel);
+            border: 1px solid var(--border-strong);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px var(--shadow);
+            backdrop-filter: blur(8px);
+            animation: slideIn 0.6s ease-out;
+            min-height: 160px;
+        }
+
+        .info-panel:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .info-panel h4 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @media (min-width: 1920px) {
+            .info-panel {
+                padding: 14px;
+                min-height: 180px;
+            }
+            
+            .info-panel h4 {
+                margin-bottom: 12px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Alt Simülasyon Kontrolleri */
+        .simulation-controls {
+            grid-column: 1 / -1; /* Tüm genişliği kapla */
+            background: var(--control-bg);
+            border: 1px solid var(--control-border);
+            border-radius: 8px;
+            padding: 10px;
+            animation: fadeIn 0.6s ease-out 0.3s both;
+            height: fit-content;
+            margin: 0;
+            overflow: visible;
+        }
+
+        @media (min-width: 1920px) {
+            .simulation-controls {
+                padding: 12px;
+                border-radius: 10px;
+            }
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Kontrol Elemanları */
+        .mode-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .mode-btn {
+            padding: 8px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        @media (min-width: 1920px) {
+            .mode-buttons {
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+            
+            .mode-btn {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: var(--panel-hover);
+            border-color: var(--primary);
+        }
+
+        .slider-container {
+            margin-bottom: 8px;
+        }
+
+        .slider-container label {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        @media (min-width: 1920px) {
+            .slider-container {
+                margin-bottom: 10px;
+            }
+            
+            .slider-container label {
+                font-size: 0.8rem;
+                margin-bottom: 4px;
+            }
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            touch-action: pan-y;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 6px var(--shadow);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px var(--shadow);
+        }
+
+        .value-display {
+            text-align: center;
+            margin-top: 2px;
+            font-weight: bold;
+            color: var(--text);
+            font-size: 0.75rem;
+        }
+
+        .physics-display {
+            background: var(--panel-hover);
+            padding: 8px;
+            border-radius: 5px;
+            border-left: 3px solid var(--accent);
+            margin-top: 6px;
+        }
+
+        .physics-display h4 {
+            margin: 0 0 5px 0;
+            color: var(--accent);
+            font-size: 0.8rem;
+            border: none;
+            padding: 0;
+        }
+
+        .physics-value {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            font-size: 0.7rem;
+            color: var(--text);
+        }
+
+        @media (min-width: 1920px) {
+            .physics-display {
+                padding: 10px;
+                margin-top: 8px;
+            }
+            
+            .physics-display h4 {
+                margin-bottom: 6px;
+                font-size: 0.85rem;
+            }
+            
+            .physics-value {
+                margin-bottom: 3px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Butonlar */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--panel-hover);
+        }
+
+        .btn-manual {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-manual:hover {
+            background: var(--accent-glow);
+        }
+
+        /* Sağ Panel İçerikleri */
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+            color: var(--text);
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 2px;
+            margin-right: 8px;
+            border-radius: 1px;
+        }
+
+        .angle-value {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            font-size: 0.75rem;
+            color: var(--text);
+        }
+
+        @media (min-width: 1920px) {
+            .legend-item {
+                margin-bottom: 8px;
+                font-size: 0.8rem;
+            }
+            
+            .legend-color {
+                width: 16px;
+                height: 3px;
+                margin-right: 10px;
+                border-radius: 2px;
+            }
+            
+            .angle-value {
+                margin-bottom: 4px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--panel);
+            margin: 2% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .close {
+            color: var(--text-muted);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: var(--text);
+        }
+
+        .manual-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--panel-hover);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .manual-section h3 {
+            color: var(--text);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .manual-section h4 {
+            color: var(--text-muted);
+            margin: 15px 0 10px 0;
+            font-size: 1rem;
+        }
+
+        .manual-section p, .manual-section li {
+            color: var(--text);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .manual-section ul {
+            padding-left: 20px;
+        }
+
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .parameter-table th, .parameter-table td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            text-align: left;
+            color: var(--text);
+        }
+
+        .parameter-table th {
+            background-color: var(--panel-hover);
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .dashboard-layout {
+                grid-template-columns: 280px 1fr 250px;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                gap: 15px;
+            }
+
+            .left-controls {
+                order: 1;
+            }
+
+            .simulation-section {
+                order: 2;
+            }
+
+            .right-info {
+                order: 3;
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .info-panel {
+                min-width: 250px;
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .container {
+                margin-top: 5px;
+                margin-bottom: 5px;
+                border-radius: 12px;
+                min-height: calc(100vh - 10px);
+                overflow: visible;
+            }
+
+            .dashboard-layout {
+                padding: 12px;
+                gap: 12px;
+                min-height: auto;
+                height: auto;
+                overflow: visible;
+            }
+
+            .control-group {
+                padding: 12px;
+            }
+
+            .right-info {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .info-panel {
+                min-width: 280px;
+                width: 100%;
+            }
+
+            .mode-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .simulation-area {
+                min-height: 400px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+                padding: 20px;
+                max-height: 85vh;
+                overflow-y: auto;
+            }
+
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                top: 15px;
+                right: 15px;
+            }
+
+            .scroll-to-top {
+                width: 45px;
+                height: 45px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tema Değiştirme Butonu -->
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <span class="icon sun">☀️</span>
+        <span class="icon moon">🌙</span>
+    </div>
+
+    <!-- Yukarı Ok Simgesi -->
+    <div class="scroll-to-top" onclick="scrollToTop()">
+        <span class="icon">⬆️</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🌊 Dalga Yansıması ve Kırılması</h1>
+            <p>Bir su yüzeyinde dalgaların yansıma ve kırılma olaylarını gösteren simülasyon</p>
+        </div>
+        
+        <!-- Dashboard Layout -->
+        <div class="dashboard-layout">
+            <!-- Sol Kontrol Paneli -->
+            <div class="left-controls">
+                <div class="control-group">
+                    <h3>🎯 Dalga Olayları Kontrolü</h3>
+                    <div class="mode-buttons">
+                        <div class="mode-btn active" id="reflectionBtn">🔄 Yansıma Göster</div>
+                        <div class="mode-btn active" id="refractionBtn">🌊 Kırılma Göster</div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>📐 Dalga Parametreleri</h3>
+                    <div class="slider-container">
+                        <label for="incidentAngle">Geliş Açısı (derece):</label>
+                        <input type="range" id="incidentAngle" class="slider" min="5" max="85" value="30">
+                        <div class="value-display" id="incidentAngleValue">30°</div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="waveFrequency">Dalga Frekansı:</label>
+                        <input type="range" id="waveFrequency" class="slider" min="0.5" max="3" value="1" step="0.1">
+                        <div class="value-display" id="waveFrequencyValue">1.0 Hz</div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="animationSpeed">Animasyon Hızı:</label>
+                        <input type="range" id="animationSpeed" class="slider" min="0.1" max="3" value="1" step="0.1">
+                        <div class="value-display" id="animationSpeedValue">1.0x</div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🌊 Ortam Özellikleri</h3>
+                    <div class="slider-container">
+                        <label for="depth1">Ortam 1 Derinliği (m):</label>
+                        <input type="range" id="depth1" class="slider" min="1" max="10" value="5" step="0.5">
+                        <div class="value-display" id="depth1Value">5.0 m</div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="depth2">Ortam 2 Derinliği (m):</label>
+                        <input type="range" id="depth2" class="slider" min="0.5" max="8" value="2" step="0.5">
+                        <div class="value-display" id="depth2Value">2.0 m</div>
+                    </div>
+                    
+                    <div class="physics-display">
+                        <h4>📊 Snell Yasası Hesaplamaları</h4>
+                        <div class="physics-value">
+                            <span>Hız Oranı (v₁/v₂):</span>
+                            <span id="speedRatioDisplay">2.00</span>
+                        </div>
+                        <div class="physics-value">
+                            <span>Kırılma İndisi (n₂/n₁):</span>
+                            <span id="refractiveIndexDisplay">2.00</span>
+                        </div>
+                        <div class="physics-value">
+                            <span>Kritik Açı:</span>
+                            <span id="criticalAngleDisplay">30.0°</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orta Simülasyon Alanı -->
+            <div class="simulation-section">
+                <div class="simulation-area">
+                    <canvas id="canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Sağ Bilgi Panelleri -->
+            <div class="right-info">
+                <div class="info-panel">
+                    <h4>🎨 Dalga Gösterimi</h4>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff4444;"></div>
+                        <span>Gelen Dalga</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #44aa44;"></div>
+                        <span>Yansıyan Dalga</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4444ff;"></div>
+                        <span>Kırılan Dalga</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #333;"></div>
+                        <span>Ortam Sınırı</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffd700;"></div>
+                        <span>Normal Doğrultu</span>
+                    </div>
+                </div>
+
+                <div class="info-panel">
+                    <h4>📐 Açı Ölçümleri</h4>
+                    <div class="angle-value">
+                        <span>Geliş Açısı (θ₁):</span>
+                        <span id="incidentAngleDisplay">30°</span>
+                    </div>
+                    <div class="angle-value">
+                        <span>Yansıma Açısı (θᵣ):</span>
+                        <span id="reflectedAngleDisplay">30°</span>
+                    </div>
+                    <div class="angle-value">
+                        <span>Kırılma Açısı (θ₂):</span>
+                        <span id="refractedAngleDisplay">14.5°</span>
+                    </div>
+                    <div class="angle-value">
+                        <span>Durum:</span>
+                        <span id="statusDisplay">Normal Kırılma</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alt Simülasyon Kontrolleri -->
+            <div class="simulation-controls">
+                <div class="controls-row">
+                    <button class="btn btn-primary" id="playPauseBtn">
+                        <span id="playPauseIcon">▶️</span>
+                        <span id="playPauseText">Başlat</span>
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <span>🔄</span>
+                        <span>Sıfırla</span>
+                    </button>
+                    <button class="btn btn-manual" id="manualBtn">
+                        <span>📖</span>
+                        <span>Kullanım Kılavuzu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kullanım Kılavuzu Modal -->
+    <div id="manualModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="color: var(--text); margin-bottom: 25px; text-align: center;">📖 Dalga Yansıması ve Kırılması Simülasyonu - Kullanım Kılavuzu</h2>
+            
+            <div class="manual-section">
+                <h3>🎯 Dashboard Layout Özellikleri</h3>
+                <p><strong>Sol Panel:</strong> Dalga parametreleri ve ortam özellikleri kontrolları</p>
+                <p><strong>Orta Alan:</strong> Simülasyon canvas'ı - geniş görüntüleme alanı</p>
+                <p><strong>Sağ Panel:</strong> Dalga gösterimi ve açı ölçümleri bilgi panelleri</p>
+                <p><strong>Alt Kısım:</strong> Simülasyon kontrolleri (Başlat/Durdur, Sıfırla, Kullanım Kılavuzu)</p>
+                <p><strong>Tema Sistemi:</strong> Dark/Light mode değiştirme ve otomatik kaydetme</p>
+            </div>
+
+            <div class="manual-section">
+                <h3>🔬 Fiziksel Temeller</h3>
+                <p>Simülasyon aşağıdaki fiziksel prensiplere dayanmaktadır:</p>
+                <ul>
+                    <li><strong>Dalga Hızı Formülü:</strong> v = √(gh) - Sığ su dalgalarının hızı yerçekimi ivmesi (g) ve su derinliği (h) ile belirlenir</li>
+                    <li><strong>Yansıma Yasası:</strong> Geliş açısı = Yansıma açısı (θᵢ = θᵣ)</li>
+                    <li><strong>Kırılma Yasası:</strong> sin(θ₁)/sin(θ₂) = v₁/v₂ = n₂/n₁</li>
+                    <li><strong>Kritik Açı:</strong> θc = arcsin(v₂/v₁) - Tam iç yansımanın başladığı açı</li>
+                </ul>
+            </div>
+
+            <div class="manual-section">
+                <h3>⚙️ Kontrol Paneli Açıklamaları</h3>
+                
+                <h4>Sol Panel - Dalga Kontrolleri</h4>
+                <p><strong>Dalga Olayları:</strong> Yansıma ve kırılma görselleştirmelerini aç/kapat</p>
+                <p><strong>Dalga Parametreleri:</strong> Geliş açısı, frekans ve animasyon hızı ayarları</p>
+                <p><strong>Ortam Özellikleri:</strong> İki ortamın derinlikleri ve fiziksel hesaplamalar</p>
+                
+                <h4>Sağ Panel - Bilgi Panelleri</h4>
+                <p><strong>Dalga Gösterimi:</strong> Canvas'taki renk kodlamasının açıklaması</p>
+                <p><strong>Açı Ölçümleri:</strong> Gerçek zamanlı açı değerleri ve durum bilgisi</p>
+                
+                <h4>Alt Panel - Simülasyon Kontrolleri</h4>
+                <p><strong>Başlat/Durdur:</strong> Animasyonu başlatır veya durdurur</p>
+                <p><strong>Sıfırla:</strong> Simülasyonu başlangıç durumuna getirir</p>
+                <p><strong>Kullanım Kılavuzu:</strong> Bu yardım modalını açar</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tema sistemi
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('wave-simulation-dashboard-theme', newTheme);
+        }
+
+        // Yukarı ok fonksiyonu
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Saved theme'i yükle
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('wave-simulation-dashboard-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            // Scroll to top butonu görünürlük kontrolü
+            const scrollToTopBtn = document.querySelector('.scroll-to-top');
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    scrollToTopBtn.classList.add('visible');
+                } else {
+                    scrollToTopBtn.classList.remove('visible');
+                }
+            });
+        });
+
+        class WaveSimulation {
+            constructor() {
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.setupCanvas();
+                
+                // Simulation parameters
+                this.isPlaying = false;
+                this.time = 0;
+                this.animationSpeed = 1;
+                this.showReflection = true;
+                this.showRefraction = true;
+                
+                // Wave properties
+                this.incidentAngle = 30;
+                this.depth1 = 5;
+                this.depth2 = 2;
+                this.frequency = 1;
+                
+                // Calculate wave speeds
+                this.speed1 = Math.sqrt(9.81 * this.depth1) * 2;
+                this.speed2 = Math.sqrt(9.81 * this.depth2) * 2;
+                
+                // Wave arrays
+                this.incidentWaves = [];
+                this.reflectedWaves = [];
+                this.refractedWaves = [];
+                
+                this.updatePhysics();
+                this.setupEventListeners();
+                this.animate();
+                
+                // Global reference for resize handler
+                window.waveSimulation = this;
+            }
+            
+            setupCanvas() {
+                const rect = this.canvas.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                
+                this.canvas.style.width = rect.width + 'px';
+                this.canvas.style.height = rect.height + 'px';
+                
+                this.width = rect.width;
+                this.height = rect.height;
+                this.boundaryX = this.width / 2;
+                this.centerY = this.height / 2;
+            }
+            
+            setupEventListeners() {
+                // Mode buttons
+                document.getElementById('reflectionBtn').addEventListener('click', () => {
+                    this.toggleReflection();
+                });
+                
+                document.getElementById('refractionBtn').addEventListener('click', () => {
+                    this.toggleRefraction();
+                });
+                
+                // Sliders
+                document.getElementById('incidentAngle').addEventListener('input', (e) => {
+                    this.incidentAngle = parseFloat(e.target.value);
+                    document.getElementById('incidentAngleValue').textContent = this.incidentAngle + '°';
+                    this.updatePhysics();
+                    this.updateDisplays();
+                });
+                
+                document.getElementById('waveFrequency').addEventListener('input', (e) => {
+                    this.frequency = parseFloat(e.target.value);
+                    document.getElementById('waveFrequencyValue').textContent = this.frequency.toFixed(1) + ' Hz';
+                });
+                
+                document.getElementById('animationSpeed').addEventListener('input', (e) => {
+                    this.animationSpeed = parseFloat(e.target.value);
+                    document.getElementById('animationSpeedValue').textContent = this.animationSpeed.toFixed(1) + 'x';
+                });
+                
+                document.getElementById('depth1').addEventListener('input', (e) => {
+                    this.depth1 = parseFloat(e.target.value);
+                    document.getElementById('depth1Value').textContent = this.depth1.toFixed(1) + ' m';
+                    this.speed1 = Math.sqrt(9.81 * this.depth1) * 2;
+                    this.updatePhysics();
+                    this.updateDisplays();
+                });
+                
+                document.getElementById('depth2').addEventListener('input', (e) => {
+                    this.depth2 = parseFloat(e.target.value);
+                    document.getElementById('depth2Value').textContent = this.depth2.toFixed(1) + ' m';
+                    this.speed2 = Math.sqrt(9.81 * this.depth2) * 2;
+                    this.updatePhysics();
+                    this.updateDisplays();
+                });
+                
+                // Control buttons
+                document.getElementById('playPauseBtn').addEventListener('click', () => {
+                    this.togglePlayPause();
+                });
+                
+                document.getElementById('resetBtn').addEventListener('click', () => {
+                    this.reset();
+                });
+
+                document.getElementById('manualBtn').addEventListener('click', () => {
+                    document.getElementById('manualModal').style.display = 'block';
+                });
+
+                document.querySelector('.close').addEventListener('click', () => {
+                    document.getElementById('manualModal').style.display = 'none';
+                });
+
+                window.addEventListener('click', (event) => {
+                    const modal = document.getElementById('manualModal');
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+            
+            toggleReflection() {
+                this.showReflection = !this.showReflection;
+                const btn = document.getElementById('reflectionBtn');
+                if (this.showReflection) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                    this.reflectedWaves = [];
+                }
+            }
+            
+            toggleRefraction() {
+                this.showRefraction = !this.showRefraction;
+                const btn = document.getElementById('refractionBtn');
+                if (this.showRefraction) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                    this.refractedWaves = [];
+                }
+            }
+            
+            updatePhysics() {
+                const incidentRad = this.incidentAngle * Math.PI / 180;
+                this.reflectedAngle = this.incidentAngle;
+                
+                const sinRefracted = (this.speed2 / this.speed1) * Math.sin(incidentRad);
+                
+                if (Math.abs(sinRefracted) <= 1) {
+                    this.refractedAngle = Math.asin(sinRefracted) * 180 / Math.PI;
+                    this.totalInternalReflection = false;
+                } else {
+                    this.refractedAngle = 90;
+                    this.totalInternalReflection = true;
+                }
+                
+                if (this.speed1 > this.speed2) {
+                    this.criticalAngle = Math.asin(this.speed2 / this.speed1) * 180 / Math.PI;
+                } else {
+                    this.criticalAngle = 90;
+                }
+                
+                this.refractiveIndex = this.speed1 / this.speed2;
+            }
+            
+            updateDisplays() {
+                document.getElementById('speedRatioDisplay').textContent = (this.speed1 / this.speed2).toFixed(2);
+                document.getElementById('refractiveIndexDisplay').textContent = this.refractiveIndex.toFixed(2);
+                document.getElementById('criticalAngleDisplay').textContent = this.criticalAngle.toFixed(1) + '°';
+                document.getElementById('incidentAngleDisplay').textContent = this.incidentAngle + '°';
+                document.getElementById('reflectedAngleDisplay').textContent = this.reflectedAngle + '°';
+                
+                if (this.totalInternalReflection && this.showRefraction) {
+                    document.getElementById('refractedAngleDisplay').textContent = 'Yok';
+                    document.getElementById('statusDisplay').textContent = 'Tam İç Yansıma';
+                } else if (this.showRefraction) {
+                    document.getElementById('refractedAngleDisplay').textContent = this.refractedAngle.toFixed(1) + '°';
+                    if (this.speed2 < this.speed1) {
+                        document.getElementById('statusDisplay').textContent = 'Normale Yaklaşma';
+                    } else {
+                        document.getElementById('statusDisplay').textContent = 'Normalden Uzaklaşma';
+                    }
+                } else {
+                    document.getElementById('refractedAngleDisplay').textContent = '-';
+                    if (this.showReflection && !this.showRefraction) {
+                        document.getElementById('statusDisplay').textContent = 'Sadece Yansıma';
+                    } else if (!this.showReflection && this.showRefraction) {
+                        document.getElementById('statusDisplay').textContent = 'Sadece Kırılma';
+                    } else if (!this.showReflection && !this.showRefraction) {
+                        document.getElementById('statusDisplay').textContent = 'Hiçbiri Gösterilmiyor';
+                    }
+                }
+            }
+            
+            togglePlayPause() {
+                this.isPlaying = !this.isPlaying;
+                const icon = document.getElementById('playPauseIcon');
+                const text = document.getElementById('playPauseText');
+                
+                if (this.isPlaying) {
+                    icon.textContent = '⏸️';
+                    text.textContent = 'Durdur';
+                    // Mobil cihazlarda canvas'a kay
+                    this.scrollToCanvas();
+                } else {
+                    icon.textContent = '▶️';
+                    text.textContent = 'Başlat';
+                }
+            }
+
+            scrollToCanvas() {
+                const canvas = document.getElementById('canvas');
+                const canvasRect = canvas.getBoundingClientRect();
+                
+                // Sadece mobil cihazlarda canvas'a kay (viewport genişliği 768px altında)
+                if (window.innerWidth <= 768) {
+                    const canvasTop = canvas.getBoundingClientRect().top + window.pageYOffset;
+                    window.scrollTo({
+                        top: canvasTop - 20, // 20px padding
+                        behavior: 'smooth'
+                    });
+                }
+            }
+            
+            reset() {
+                this.time = 0;
+                this.clearWaves();
+                this.isPlaying = false;
+                const icon = document.getElementById('playPauseIcon');
+                const text = document.getElementById('playPauseText');
+                icon.textContent = '▶️';
+                text.textContent = 'Başlat';
+            }
+            
+            clearWaves() {
+                this.incidentWaves = [];
+                this.reflectedWaves = [];
+                this.refractedWaves = [];
+            }
+            
+            createWaves() {
+                if (!this.isPlaying) return;
+                
+                const baseInterval = 40;
+                const interval = Math.floor(baseInterval / (this.frequency * this.animationSpeed));
+                const adjustedTime = Math.floor(this.time);
+                
+                if (adjustedTime % Math.max(1, interval) === 0) {
+                    this.createIncidentWaveFront();
+                }
+            }
+            
+            createIncidentWaveFront() {
+                const incidentRad = this.incidentAngle * Math.PI / 180;
+                const waveFrontLength = 150;
+                const numPoints = 10;
+                
+                const startX = 50;
+                const startY = this.centerY - 150;
+                
+                const perpAngle = incidentRad + Math.PI / 2;
+                
+                for (let i = 0; i < numPoints; i++) {
+                    const offset = (i - (numPoints - 1) / 2) * (waveFrontLength / (numPoints - 1));
+                    const x = startX + offset * Math.cos(perpAngle);
+                    const y = startY + offset * Math.sin(perpAngle);
+                    
+                    this.incidentWaves.push({
+                        x: x,
+                        y: y,
+                        vx: this.speed1 * Math.cos(incidentRad) * 0.5 * this.animationSpeed,
+                        vy: this.speed1 * Math.sin(incidentRad) * 0.5 * this.animationSpeed,
+                        age: 0,
+                        maxAge: Math.floor(300 / this.animationSpeed),
+                        frontId: this.time
+                    });
+                }
+            }
+            
+            updateWaves() {
+                this.incidentWaves = this.incidentWaves.filter(wave => {
+                    wave.x += wave.vx;
+                    wave.y += wave.vy;
+                    wave.age++;
+                    
+                    if (wave.x >= this.boundaryX && wave.age > 10) {
+                        if (this.showReflection) {
+                            this.createReflectedWave(wave);
+                        }
+                        if (this.showRefraction) {
+                            this.createRefractedWave(wave);
+                        }
+                        return false;
+                    }
+                    
+                    return wave.age < wave.maxAge && wave.x < this.width + 50;
+                });
+                
+                this.reflectedWaves = this.reflectedWaves.filter(wave => {
+                    wave.x += wave.vx;
+                    wave.y += wave.vy;
+                    wave.age++;
+                    return wave.age < wave.maxAge && wave.x > -50;
+                });
+                
+                this.refractedWaves = this.refractedWaves.filter(wave => {
+                    wave.x += wave.vx;
+                    wave.y += wave.vy;
+                    wave.age++;
+                    return wave.age < wave.maxAge && wave.x < this.width + 50;
+                });
+            }
+            
+            createReflectedWave(incidentWave) {
+                const reflectedRad = this.reflectedAngle * Math.PI / 180;
+                this.reflectedWaves.push({
+                    x: this.boundaryX - 5,
+                    y: incidentWave.y,
+                    vx: -this.speed1 * Math.cos(reflectedRad) * 0.5 * this.animationSpeed,
+                    vy: this.speed1 * Math.sin(reflectedRad) * 0.5 * this.animationSpeed,
+                    age: 0,
+                    maxAge: Math.floor(300 / this.animationSpeed)
+                });
+            }
+            
+            createRefractedWave(incidentWave) {
+                if (this.totalInternalReflection) return;
+                
+                const refractedRad = this.refractedAngle * Math.PI / 180;
+                this.refractedWaves.push({
+                    x: this.boundaryX + 5,
+                    y: incidentWave.y,
+                    vx: this.speed2 * Math.cos(refractedRad) * 0.5 * this.animationSpeed,
+                    vy: this.speed2 * Math.sin(refractedRad) * 0.5 * this.animationSpeed,
+                    age: 0,
+                    maxAge: Math.floor(400 / this.animationSpeed)
+                });
+            }
+            
+            drawBackground() {
+                const ctx = this.ctx;
+                
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--simulation-bg') || '#f0f8ff';
+                ctx.fillRect(0, 0, this.width, this.height);
+                
+                // Medium 1 (left)
+                ctx.fillStyle = 'rgba(135, 206, 235, 0.4)';
+                ctx.fillRect(0, 0, this.boundaryX, this.height);
+                
+                // Medium 2 (right)
+                ctx.fillStyle = 'rgba(32, 178, 170, 0.6)';
+                ctx.fillRect(this.boundaryX, 0, this.width - this.boundaryX, this.height);
+                
+                // Boundary line
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(this.boundaryX, 0);
+                ctx.lineTo(this.boundaryX, this.height);
+                ctx.stroke();
+                
+                // Normal line
+                ctx.strokeStyle = '#ffd700';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([10, 5]);
+                ctx.beginPath();
+                ctx.moveTo(this.boundaryX - 150, this.centerY);
+                ctx.lineTo(this.boundaryX + 150, this.centerY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                this.drawDirectionLines();
+                
+                // Intersection point
+                ctx.fillStyle = '#ff4500';
+                ctx.beginPath();
+                ctx.arc(this.boundaryX, this.centerY, 8, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Labels
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Ortam 1 (h = ${this.depth1} m)`, this.boundaryX / 2, 30);
+                ctx.fillText(`Ortam 2 (h = ${this.depth2} m)`, this.boundaryX + (this.width - this.boundaryX) / 2, 30);
+            }
+            
+            drawDirectionLines() {
+                const ctx = this.ctx;
+                const centerX = this.boundaryX;
+                const centerY = this.centerY;
+                const lineLength = 120;
+                
+                const incidentRad = this.incidentAngle * Math.PI / 180;
+                ctx.strokeStyle = 'rgba(255, 68, 68, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 8]);
+                ctx.beginPath();
+                ctx.moveTo(centerX - lineLength * Math.cos(incidentRad), centerY - lineLength * Math.sin(incidentRad));
+                ctx.lineTo(centerX, centerY);
+                ctx.stroke();
+                
+                if (this.showReflection) {
+                    const reflectedRad = this.reflectedAngle * Math.PI / 180;
+                    ctx.strokeStyle = 'rgba(68, 170, 68, 0.6)';
+                    ctx.setLineDash([8, 8]);
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(centerX - lineLength * Math.cos(reflectedRad), centerY + lineLength * Math.sin(reflectedRad));
+                    ctx.stroke();
+                }
+                
+                if (this.showRefraction && !this.totalInternalReflection) {
+                    const refractedRad = this.refractedAngle * Math.PI / 180;
+                    ctx.strokeStyle = 'rgba(68, 68, 255, 0.6)';
+                    ctx.setLineDash([8, 8]);
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(centerX + lineLength * Math.cos(refractedRad), centerY + lineLength * Math.sin(refractedRad));
+                    ctx.stroke();
+                }
+                
+                ctx.setLineDash([]);
+            }
+            
+            drawWaves() {
+                const ctx = this.ctx;
+                
+                ctx.fillStyle = '#ff4444';
+                this.incidentWaves.forEach(wave => {
+                    const alpha = 1 - (wave.age / wave.maxAge);
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    ctx.arc(wave.x, wave.y, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+                
+                if (this.showReflection) {
+                    ctx.fillStyle = '#44aa44';
+                    this.reflectedWaves.forEach(wave => {
+                        const alpha = 1 - (wave.age / wave.maxAge);
+                        ctx.globalAlpha = alpha;
+                        ctx.beginPath();
+                        ctx.arc(wave.x, wave.y, 5, 0, 2 * Math.PI);
+                        ctx.fill();
+                    });
+                }
+                
+                if (this.showRefraction) {
+                    ctx.fillStyle = '#0066ff';
+                    this.refractedWaves.forEach(wave => {
+                        const alpha = 1 - (wave.age / wave.maxAge);
+                        ctx.globalAlpha = alpha;
+                        ctx.beginPath();
+                        ctx.arc(wave.x, wave.y, 8, 0, 2 * Math.PI);
+                        ctx.fill();
+                    });
+                }
+                
+                ctx.globalAlpha = 1;
+            }
+            
+            animate() {
+                if (this.isPlaying) {
+                    this.time += this.animationSpeed;
+                    this.createWaves();
+                    this.updateWaves();
+                }
+                
+                this.drawBackground();
+                this.drawWaves();
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            const simulation = new WaveSimulation();
+            simulation.updateDisplays();
+        });
+        
+        // Optimized resize handler with debounce
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const simulation = window.waveSimulation;
+                if (simulation) {
+                    simulation.setupCanvas();
+                }
+            }, 250);
+        });
+    </script>
+</body>
+</html>
