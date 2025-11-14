@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="author" content="Cresas - Emre">
     <title>Dalga Yansıması ve Kırılması - Snell Yasası</title>
     <style>
         :root{
@@ -981,19 +982,15 @@
         </div>
     </div>
 
-    <!-- Kullanım Kılavuzu Modal -->
-    <div id="manualModal" class="modal">
+     <!-- Kullanım Kılavuzu Modal -->
+    <div id="manualModal" class="modal" style="display: none;">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 style="color: var(--text); margin-bottom: 25px; text-align: center;">📖 Dalga Yansıması ve Kırılması Simülasyonu - Kullanım Kılavuzu</h2>
+            <span class="close">×</span>
+            <h2 style="color: #ffffff; margin-bottom: 25px; text-align: center;">📖 Dalga Yansıması ve Kırılması Simülasyonu - Kullanım Kılavuzu</h2>
             
             <div class="manual-section">
-                <h3>🎯 Dashboard Layout Özellikleri</h3>
-                <p><strong>Sol Panel:</strong> Dalga parametreleri ve ortam özellikleri kontrolları</p>
-                <p><strong>Orta Alan:</strong> Simülasyon canvas'ı - geniş görüntüleme alanı</p>
-                <p><strong>Sağ Panel:</strong> Dalga gösterimi ve açı ölçümleri bilgi panelleri</p>
-                <p><strong>Alt Kısım:</strong> Simülasyon kontrolleri (Başlat/Durdur, Sıfırla, Kullanım Kılavuzu)</p>
-                <p><strong>Tema Sistemi:</strong> Dark/Light mode değiştirme ve otomatik kaydetme</p>
+                <h3>🎯 Simülasyonun Amacı</h3>
+                <p>Bu simülasyon, farklı derinliklere sahip iki su ortamı arasındaki sınırda meydana gelen dalga yansıması ve kırılması olaylarını görselleştirmektedir. Simülasyon, sığ su dalgalarının davranışını matematiksel modeller kullanarak gerçek zamanlı olarak göstermektedir.</p>
             </div>
 
             <div class="manual-section">
@@ -1008,24 +1005,172 @@
             </div>
 
             <div class="manual-section">
-                <h3>⚙️ Kontrol Paneli Açıklamaları</h3>
+                <h3>🎮 Kontrol Paneli Açıklamaları</h3>
                 
-                <h4>Sol Panel - Dalga Kontrolleri</h4>
-                <p><strong>Dalga Olayları:</strong> Yansıma ve kırılma görselleştirmelerini aç/kapat</p>
-                <p><strong>Dalga Parametreleri:</strong> Geliş açısı, frekans ve animasyon hızı ayarları</p>
-                <p><strong>Ortam Özellikleri:</strong> İki ortamın derinlikleri ve fiziksel hesaplamalar</p>
+                <h4>Dalga Olayları Kontrolü</h4>
+                <table class="parameter-table">
+                    <tbody><tr>
+                        <th>Kontrol</th>
+                        <th>İşlev</th>
+                        <th>Açıklama</th>
+                    </tr>
+                    <tr>
+                        <td>🔄 Yansıma Göster</td>
+                        <td>Yansıyan dalgaları aktif/pasif yapar</td>
+                        <td>Yeşil renkli yansıyan dalga parçacıklarının görünürlüğünü kontrol eder</td>
+                    </tr>
+                    <tr>
+                        <td>🌊 Kırılma Göster</td>
+                        <td>Kırılan dalgaları aktif/pasif yapar</td>
+                        <td>Mavi renkli kırılan dalga parçacıklarının görünürlüğünü kontrol eder</td>
+                    </tr>
+                </tbody></table>
+
+                <h4>Dalga Parametreleri</h4>
+                <table class="parameter-table">
+                    <tbody><tr>
+                        <th>Parametre</th>
+                        <th>Aralık</th>
+                        <th>Etki</th>
+                    </tr>
+                    <tr>
+                        <td>Geliş Açısı</td>
+                        <td>5° - 85°</td>
+                        <td>Dalgaların ortam sınırına çarpma açısını belirler. Büyük açılarda tam iç yansıma gözlenebilir</td>
+                    </tr>
+                    <tr>
+                        <td>Dalga Frekansı</td>
+                        <td>0.5 - 3.0 Hz</td>
+                        <td>Birim zamanda üretilen dalga sayısını kontrol eder. Yüksek frekans daha sık dalga üretir</td>
+                    </tr>
+                    <tr>
+                        <td>Animasyon Hızı</td>
+                        <td>0.1x - 3.0x</td>
+                        <td>Simülasyonun genel hızını ayarlar. Yavaş hızlarda detaylar daha iyi gözlenebilir</td>
+                    </tr>
+                </tbody></table>
+
+                <h4>Ortam Özellikleri</h4>
+                <table class="parameter-table">
+                    <tbody><tr>
+                        <th>Parametre</th>
+                        <th>Aralık</th>
+                        <th>Fiziksel Anlamı</th>
+                    </tr>
+                    <tr>
+                        <td>Ortam 1 Derinliği</td>
+                        <td>1.0 - 10.0 m</td>
+                        <td>Sol taraftaki ortamın su derinliği. Dalga hızını v₁ = √(9.81 × h₁) formülüyle belirler</td>
+                    </tr>
+                    <tr>
+                        <td>Ortam 2 Derinliği</td>
+                        <td>0.5 - 8.0 m</td>
+                        <td>Sağ taraftaki ortamın su derinliği. Dalga hızını v₂ = √(9.81 × h₂) formülüyle belirler</td>
+                    </tr>
+                </tbody></table>
+            </div>
+
+            <div class="manual-section">
+                <h3>📊 Hesaplama Paneli</h3>
+                <p>Simülasyon gerçek zamanlı olarak aşağıdaki değerleri hesaplar ve görüntüler:</p>
+                <ul>
+                    <li><strong>Hız Oranı (v₁/v₂):</strong> İki ortamdaki dalga hızlarının oranı</li>
+                    <li><strong>Kırılma İndisi (n₂/n₁):</strong> Optikteki kırılma indisine benzer, hız oranının tersi</li>
+                    <li><strong>Kritik Açı:</strong> Tam iç yansımanın başladığı minimum geliş açısı</li>
+                    <li><strong>Açı Ölçümleri:</strong> Geliş, yansıma ve kırılma açılarının anlık değerleri</li>
+                    <li><strong>Durum Analizi:</strong> Mevcut parametrelere göre dalga davranışının kategorisi</li>
+                </ul>
+            </div>
+
+            <div class="manual-section">
+                <h3>🎨 Görsel Gösterimler</h3>
+                <table class="parameter-table">
+                    <tbody><tr>
+                        <th>Renk/Sembol</th>
+                        <th>Anlamı</th>
+                        <th>Açıklama</th>
+                    </tr>
+                    <tr>
+                        <td style="color: #ff4444;">● Kırmızı Noktalar</td>
+                        <td>Gelen Dalga</td>
+                        <td>Ortam 1'den gelerek sınıra çarpan dalga parçacıkları</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #44aa44;">● Yeşil Noktalar</td>
+                        <td>Yansıyan Dalga</td>
+                        <td>Sınırdan geri dönen dalga parçacıkları</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #4444ff;">● Mavi Noktalar</td>
+                        <td>Kırılan Dalga</td>
+                        <td>Ortam 2'ye geçen dalga parçacıkları (daha büyük boyutlu)</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #000;">━ Siyah Çizgi</td>
+                        <td>Ortam Sınırı</td>
+                        <td>İki farklı derinlikteki ortamı ayıran sınır</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #ffd700;">┅ Sarı Kesikli Çizgi</td>
+                        <td>Normal Doğrultu</td>
+                        <td>Sınıra dik olan referans doğrusu</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #ff4500;">● Turuncu Nokta</td>
+                        <td>Kesişim Noktası</td>
+                        <td>Dalgaların sınırla buluştuğu merkez nokta</td>
+                    </tr>
+                </tbody></table>
+            </div>
+
+            <div class="manual-section">
+                <h3>⚙️ Simülasyon Kontrolleri</h3>
+                <table class="parameter-table">
+                    <tbody><tr>
+                        <th>Buton</th>
+                        <th>İşlev</th>
+                        <th>Kullanım</th>
+                    </tr>
+                    <tr>
+                        <td>▶️ Başlat / ⏸️ Durdur</td>
+                        <td>Animasyonu başlatır/durdurur</td>
+                        <td>Dalga üretimini ve hareketini kontrol eder</td>
+                    </tr>
+                    <tr>
+                        <td>🔄 Sıfırla</td>
+                        <td>Simülasyonu başlangıç durumuna getirir</td>
+                        <td>Tüm dalga parçacıklarını temizler ve zamanı sıfırlar</td>
+                    </tr>
+                </tbody></table>
+            </div>
+
+            <div class="manual-section">
+                <h3>🔬 Deneysel Gözlemler</h3>
+                <h4>Normal Kırılma (h₁ &gt; h₂)</h4>
+                <p>Derin ortamdan sığ ortama geçen dalgalar normale yaklaşır (kırılma açısı &lt; geliş açısı).</p>
                 
-                <h4>Sağ Panel - Bilgi Panelleri</h4>
-                <p><strong>Dalga Gösterimi:</strong> Canvas'taki renk kodlamasının açıklaması</p>
-                <p><strong>Açı Ölçümleri:</strong> Gerçek zamanlı açı değerleri ve durum bilgisi</p>
+                <h4>Ters Kırılma (h₁ &lt; h₂)</h4>
+                <p>Sığ ortamdan derin ortama geçen dalgalar normalden uzaklaşır (kırılma açısı &gt; geliş açısı).</p>
                 
-                <h4>Alt Panel - Simülasyon Kontrolleri</h4>
-                <p><strong>Başlat/Durdur:</strong> Animasyonu başlatır veya durdurur</p>
-                <p><strong>Sıfırla:</strong> Simülasyonu başlangıç durumuna getirir</p>
-                <p><strong>Kullanım Kılavuzu:</strong> Bu yardım modalını açar</p>
+                <h4>Tam İç Yansıma</h4>
+                <p>Geliş açısı kritik açıyı aştığında kırılma gerçekleşmez, tüm enerji yansır.</p>
+                
+                <h4>Enerji Korunumu</h4>
+                <p>Gelen dalga enerjisi yansıyan ve kırılan dalgalar arasında paylaşılır.</p>
+            </div>
+
+            <div class="manual-section">
+                <h3>📚 Eğitim Önerileri</h3>
+                <ul>
+                    <li>Önce tek bir olayı (yansıma veya kırılma) aktif ederek gözlemleyin</li>
+                    <li>Geliş açısını yavaşça artırarak kritik açıyı bulun</li>
+                    <li>Farklı derinlik oranlarında dalga davranışlarını karşılaştırın</li>
+                    <li>Animasyon hızını düşürerek detayları inceleyin</li>
+                    <li>Hesaplanan değerleri teorik formüllerle doğrulayın</li>
+                </ul>
             </div>
         </div>
-    </div>
+     </div>
 
     <script>
         // Tema sistemi
